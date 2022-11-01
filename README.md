@@ -7,16 +7,16 @@ This solution is deployed using a Azure bicep template.
 
 ```mermaid
 sequenceDiagram
-    user->>spo: User selects lookbook template 
-    participant spo   as SharePoint Online (Site Template)
+    user->>spo: selects lookbook template 
+    participant spo   as SharePoint Online
     participant logic as Logic App
     participant queue as Azure Storage Queue
     participant func  as Azure PowerShell based Function
     participant user  as Site Admin
     spo->>logic:   sends site template request
-    logic->>queue: adds message to Azure Storage Queue
+    logic->>queue: adds message to queue
     queue->>func:  listens for new message
-    func->>spo:    receives message and applies selected template
+    func->>spo:    applies requested template
 ```
 
 ## Managed Identities and RBAC Roles
