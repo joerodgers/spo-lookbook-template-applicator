@@ -7,7 +7,7 @@ sequenceDiagram
     participant spo   as SharePoint Online
     participant logic as Logic App
     participant queue as Azure Storage Queue
-    participant func  as Azure PowerShell based Function
+    participant func  as Azure Function
     participant user  as Site Admin
     spo->>logic:   sends site template request
     logic->>queue: adds message to queue
