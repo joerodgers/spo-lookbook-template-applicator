@@ -18,6 +18,14 @@ sequenceDiagram
 ## Summary
 This solution is designed to allow companies to self-host (using Azure PaaS) their Lookbook Template Applicator process.  This particlar solution allows users to apply the <a href='https://lookbook.microsoft.com/details/c9300e94-6e83-471a-b767-b7878689e97e'>Landing</a> template or the <a href='https://lookbook.microsoft.com/details/6944f54d-cc8e-45ca-ba13-5f887a2d5f81'>Perspective</a> template to existing Communication Site in their Office 365 tenant.   
 
+## Security Overview
+
+### Logic App 
+This solution enables a System Assigned Managed Identity on the Logic App.  This managed identity (service principal) is granted the "Storage Queue Data Message Sender" RBAC role on the Azure Storage Queue, allowing the Logic App's Service Principal to add messasges to the Azure Storage Queue.
+
+### App Service
+Additionally, the solution enables a System Assigned Managed Identity on the Azure Function's App Service (host).  This managed identity (service principal) is granted the "Storage Queue Data Message Processor" RBAC role on the Azure Storage Queue, allowing the Azur Function to automatically trigger when a new message is added to the Azure Storage Queue.  Finally, the App Service's Service Principal is granted "Sites.FullControl.All" rights to SharePoint Online (via grant-msi-permission.ps1).  This permssion set allows the App Service's Service Principal to authenticate to the target SharePoint Online site and apply the requested Lookbook template.
+
 <br/>
 
 ## Deployment Prerequisites
@@ -37,9 +45,9 @@ This solution is deployed to to Azure using a <a href='https://learn.microsoft.c
         -ResourceGroup  'rg-example-prod-eastus'
 ```
 ## App Service Managed Identity Permission
-After the App Service has been successfully provisioned in Azure, retrieve the App Service's Managed Identity's objectId from the Azure portal, under the Identity blade.  
+After the App Service has been successfully provisioned in Azure, retrieve the App Service's Managed Identity objectId from the Azure portal, under the Identity blade.  
 
-In order for the App Service's System Assigned Managed Identity (Service Principal) to access sites in SharePoint Online, it needs to be granted *Sites.FullControl.All* rights to the Office 365 tenant. The PowerShell script *grant-msi-permission.ps1* will grant the necessary permission, however this script must be run as a Azure AD Administrator since it's granting a Application permssion to the service principal.
+In order for the App Service's System Assigned Managed Identity (Service Principal) to access sites in SharePoint Online, it needs to be granted *Sites.FullControl.All* rights to the Office 365 tenant. The PowerShell script *grant-msi-permission.ps1* will grant the necessary permission, however this script must be run as a Azure AD Administrator since it's granting a Application permssion to the service principal.  The FunctionMSIObjectId parameter is the objectId value retrived from the Azure portal.
 
 ### Example
 ```powershell
@@ -61,11 +69,5 @@ After the Azure Solution has been successfully deployed and App Service has been
         -CertificateThumbprint 'fy4ryc57n28wbaubnf6bynqhputtqistt4zehxj9'
 ```
 
-## Security Overview
 
-### Logic App 
-This solution enables a System Assigned Managed Identity on the Logic App.  This managed identity (service principal) is granted the "Storage Queue Data Message Sender" RBAC role on the Azure Storage Queue, allowing the Logic App's Service Principal to add messasges to the Azure Storage Queue.
-
-### App Service
-Additionally, the solution enables a System Assigned Managed Identity on the Azure Function's App Service (host).  This managed identity (service principal) is granted the "Storage Queue Data Message Processor" RBAC role on the Azure Storage Queue, allowing the Azur Function to automatically trigger when a new message is added to the Azure Storage Queue.  Finally, the App Service's Service Principal is granted "Sites.FullControl.All" rights to SharePoint Online (via grant-msi-permission.ps1).  This permssion set allows the App Service's Service Principal to authenticate to the target SharePoint Online site and apply the requested Lookbook template.
 
