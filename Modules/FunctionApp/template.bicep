@@ -58,7 +58,7 @@ resource fa 'Microsoft.Web/sites@2020-12-01' = {
           value: ai.properties.InstrumentationKey
         }
       ]
-      powerShellVersion: '7.2'
+      powerShellVersion: '7.0' // need to stay at version 7.0 until this issue is fixed: https://github.com/pnp/powershell/issues/2136
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       use32BitWorkerProcess: false
