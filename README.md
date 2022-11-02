@@ -3,16 +3,17 @@
 ## Process Flow Diagram
 ```mermaid
 sequenceDiagram
-    user->>spo: selects lookbook template 
+    user->>spo: selects template 
     participant spo   as SharePoint Online
     participant logic as Logic App
     participant queue as Azure Storage Queue
     participant func  as Azure Function
     participant user  as Site Admin
-    spo->>logic:   sends site template request
-    logic->>queue: adds message to queue
-    queue->>func:  listens for new message
-    func->>spo:    applies requested template
+    spo->>logic: sends template request
+    logic->>queue: adds message details to queue
+    func->>queue: polls for new queue message
+    queue->>func: acts on queue message
+    func->>spo: applies template to site defined in queue message
 ```
 
 ## Summary
