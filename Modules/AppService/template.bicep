@@ -3,7 +3,7 @@ param location string = resourceGroup().location
 param sku      string = 'Y1'
 param tier     string = 'Dynamic'
 
-resource as 'Microsoft.Web/serverfarms@2021-01-01' = {
+resource ap 'Microsoft.Web/serverfarms@2021-01-01' = {
   name: name
   location: location
   sku: {
@@ -12,4 +12,4 @@ resource as 'Microsoft.Web/serverfarms@2021-01-01' = {
   }
 }
 
-output name string = as.name
+output name string = ap.name

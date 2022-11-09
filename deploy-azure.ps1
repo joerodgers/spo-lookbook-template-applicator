@@ -1,4 +1,4 @@
-﻿#requires -modules "Az.Resources", "Az.Accounts"
+﻿#requires -modules "Az.Resources", "Az.Accounts", "Az.WebSites"
 
 param
 (
@@ -32,9 +32,9 @@ if( $ctx.Tenant.Id -ne $TenantId.ToString() -or $ctx.Subscription.SubscriptionId
     $ctx = Get-AzContext
 }
 
-
 $subscription  = Select-AzSubscription -SubscriptionId $SubscriptionId -Tenant $TenantId -WarningAction SilentlyContinue -Force
 $templatePath  = Join-Path -Path $PSScriptRoot -ChildPath "main.bicep"
+$storageAclsBicepPath = Join-Path -Path $PSScriptRoot -ChildPath "storage-acls.bicep"
 
 Write-Host ""
 Write-Host "[$(Get-Date)] - Connected as:   $($ctx.Account.Id)"
@@ -62,13 +62,15 @@ Write-Host "[$(Get-Date)] - Log Path:       $PSScriptRoot\deploymentlogs"
 # start infrastructure deployment
 
     Write-Host 
-    Write-Host "[$(Get-Date)] - Starting Infrastructure deployment"
+    Write-Host "[$(Get-Date)] - Starting infrastructure deployment"
    
     $deployment = New-AzResourceGroupDeployment `
                         -ResourceGroupName     $ResourceGroup `
                         -TemplateFile          $templatePath `
                         -Verbose
 
+    if( -not $deployment ) {return }
+    
     Write-Host "[$(Get-Date)] - Deployment $($deployment.ProvisioningState)"
 
     if( $deployment.OutputsString )
@@ -93,7 +95,7 @@ Write-Host "[$(Get-Date)] - Log Path:       $PSScriptRoot\deploymentlogs"
                 -Force `
                 -ErrorAction Stop
       
-    Write-Host "[$(Get-Date)] - Publishing compressed archive"
+    Write-Host "[$(Get-Date)] - Publishing compressed archive to Azure Function: $($deployment.Outputs.functionApp.Value)"
 
     $null = Publish-AzWebApp `
                 -ResourceGroupName $ResourceGroup `
@@ -105,3 +107,9 @@ Write-Host "[$(Get-Date)] - Log Path:       $PSScriptRoot\deploymentlogs"
     Write-Host "[$(Get-Date)] - Completed Zip deployment"
 
 
+    Write-Host "[$(Get-Date)] - Starting post-setup infrastructure deployment to secure storage account"
+
+    $deployment = New-AzResourceGroupDeployment `
+                        -ResourceGroupName     $ResourceGroup `
+                        -TemplateFile          $storageAclsBicepPath `
+                        -Verbose

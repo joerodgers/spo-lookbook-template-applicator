@@ -1,5 +1,6 @@
-﻿param name     string
-param location string = resourceGroup().location
+﻿param name             string
+param location         string = resourceGroup().location
+param networkAcls      object = {}
 
 resource StorageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   name: name
@@ -10,6 +11,12 @@ resource StorageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   }
   properties: {
     allowBlobPublicAccess: false
+    networkAcls: !empty(networkAcls) ? {
+      bypass: contains(networkAcls, 'bypass') ? networkAcls.bypass : 'None'
+      defaultAction: contains(networkAcls, 'defaultAction') ? networkAcls.defaultAction : null
+      virtualNetworkRules: contains(networkAcls, 'virtualNetworkRules') ? networkAcls.virtualNetworkRules : []
+      ipRules: contains(networkAcls, 'ipRules') ? networkAcls.ipRules : []
+    } : null
   }
 }
 

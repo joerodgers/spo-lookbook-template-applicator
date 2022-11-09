@@ -4,7 +4,7 @@ param appService string
 param storage    string
 param insights   string
 
-resource as 'Microsoft.Web/serverfarms@2021-01-01' existing = {
+resource ap 'Microsoft.Web/serverfarms@2021-01-01' existing = {
   name: appService
 }
 
@@ -25,7 +25,7 @@ resource fa 'Microsoft.Web/sites@2020-12-01' = {
   }
   properties: {
     httpsOnly: true
-    serverFarmId: as.id
+    serverFarmId: ap.id
     siteConfig: {
       appSettings: [
         {
@@ -57,8 +57,12 @@ resource fa 'Microsoft.Web/sites@2020-12-01' = {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: ai.properties.InstrumentationKey
         }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME_VERSION'
+          value: '~7' // need to stay at version 7.0 until this issue is fixed: https://github.com/pnp/powershell/issues/2136
+        }
       ]
-      powerShellVersion: '7.0' // need to stay at version 7.0 until this issue is fixed: https://github.com/pnp/powershell/issues/2136
+      // powerShellVersion: '7.2' // need to stay at version 7.0 until this issue is fixed: https://github.com/pnp/powershell/issues/2136
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       use32BitWorkerProcess: false

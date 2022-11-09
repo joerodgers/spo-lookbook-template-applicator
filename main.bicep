@@ -7,6 +7,7 @@ module storage 'Modules/StorageAccount/template.bicep' = {
   params: {
     name: 'st${suffix}'
     location: location
+    networkAcls: {bypass: 'AzureServices', defaultAction: 'Allow'}
   }
 }
 
@@ -103,11 +104,11 @@ module roleassignments 'Modules/RoleAssignments/template.bicep' = {
         roleDefinitionId: 'c6a89b2d-59bc-44d0-9896-0f6e12d7b80a' // Storage Queue Data Message Sender - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
         principalType: 'ServicePrincipal'
       }
-      {
-        principalId: logicapp.outputs.principalId
-        roleDefinitionId: 'acdd72a7-3385-48ef-bd42-f606fba81ae7' // Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
-        principalType: 'ServicePrincipal'
-      }
+      //{
+      //  principalId: logicapp.outputs.principalId
+      //  roleDefinitionId: 'acdd72a7-3385-48ef-bd42-f606fba81ae7' // Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
+      //  principalType: 'ServicePrincipal'
+      //}
     ]
   }
 }
