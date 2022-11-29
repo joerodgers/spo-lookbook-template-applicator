@@ -1,4 +1,6 @@
-﻿
+﻿[System.Net.WebRequest]::DefaultWebProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials 
+[System.Net.ServicePointManager]::SecurityProtocol   = [System.Net.SecurityProtocolType]::Tls12
+
 $siteUrl  = "https://contoso.sharepoint.com/sites/teamsite"
 $template = "Landing" # Landing OR Perspective 
 
